@@ -4,22 +4,18 @@ Call python3 functions in fastjob
 
 Depends on "github.com/DataDog/go-python3" with iap_patched features
 
-REF:
-	https://docs.python.org/3/c-api/index.html
-	https://github.com/python/cpython
-	https://github.com/DataDog/go-python3
 */
 package fastjobpython3
 
 import (
 	"fmt"
-	_ "net"
 	"os"
 	"path/filepath"
 	"runtime"
-	_ "runtime"
 	"strings"
-
+    "log"
+    
+    fastjob "github.com/iapyeh/fastjob"
 	model "github.com/iapyeh/fastjob/model"
 	python3 "github.com/iapyeh/go-python3"
 )
@@ -34,7 +30,7 @@ type Py3Interpreter struct {
 
 // py3 is singleton the Py3Interpreter
 var py3 *Py3Interpreter
-
+// return a singleton of Py3Interpreter
 func NewPy3() *Py3Interpreter {
 	if py3 != nil {
 		return py3
@@ -47,8 +43,20 @@ func NewPy3() *Py3Interpreter {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Py3Interper initialized")
+	log.Println("Py3Interper initialized")
+
+
+    // This will be called after all of the init() were called
+    fastjob.RunInMain(99,func(){
+        // Trigger the "callWhenRunning" event handlers
+        python3.CallWhenRunning()
+    })
+
 	return py3
+}
+// Alias of NewPy3
+func New() *Py3Interpreter {
+    return NewPy3()
 }
 
 func (py3 *Py3Interpreter) AddTree(tree ...*TreeRoot) {
@@ -84,23 +92,7 @@ func (py3 *Py3Interpreter) ImportModule(path string) *python3.PyObject {
 	defer python3.PyGILState_Release(gil)
 	defer runtime.UnlockOSThread()
 
-    fmt.Println("Import python module",path)
-    /*
-	folder := filepath.Dir(path)
-	if folder == "" {
-		folder, _ = os.Getwd()
-	}
-    
-    folder, err := filepath.Abs(folder)
-    if err != nil{
-        panic(err)
-    }
-
-    _, err = os.Stat(folder)
-    if os.IsNotExist(err) {
-        panic(fmt.Sprintf("%v (%v) is not found", folder))
-    }    
-    */
+    log.Println("Import python module",path)
 
     folder, _ := os.Getwd()
     

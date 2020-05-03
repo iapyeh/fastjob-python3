@@ -129,10 +129,14 @@ func initializePython() error {
 	return err
 }
 
+/*
+// 2019-10-23T14:45:51+00:00
 // CallWhenRunning , 現在是手動呼叫，將來應該放在AddTree時，在tree ready時自動呼叫
-// (2019-10-23T14:45:51+00:00)
+// 2020-05-03T08:53:47+00:00
+// 已經改在callpy.go裡面自動呼叫
 func CallWhenRunning() {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	go python3.CallWhenRunning()
 }
+*/
